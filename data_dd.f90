@@ -6,34 +6,54 @@ Module data_module
      !! Base data type
    Contains
      ! Public Methods
-     Generic, Public :: Operator( * ) => multiply
+     Generic                                      , Public  :: Operator( * ) => multiply
+     Procedure( print_interface        ), Deferred, Public  :: print
+     Generic                                      , Public  :: put           => put_real, put_complex
      ! Private implementations
      Procedure( multiply_interface     ), Deferred, Private :: multiply
      Procedure( mult_real_dd_interface ), Deferred, Private :: mult_real_dd
      Procedure( mult_comp_dd_interface ), Deferred, Private :: mult_comp_dd
+     Procedure( put_real_interface     ), Deferred, Private :: put_real
+     Procedure( put_complex_interface  ), Deferred, Private :: put_complex
   End type data
 
   Type, Public, Extends( data ) :: real_data
      !! Real data type
      Real, Private :: values
    Contains
+     ! Public Methods
+     Procedure, Public  :: print        => print_real
+     ! Private implementations
      Procedure, Private :: multiply     => multiply_real_real
      Procedure, Private :: mult_real_dd => multiply_real_real_dd
      Procedure, Private :: mult_comp_dd => multiply_complex_real_dd
+     Procedure, Private :: put_real     => real_put_real
+     Procedure, Private :: put_complex  => real_put_complex
   End type real_data
 
   Type, Public, Extends( data ) :: complex_data
      !! Complex data type
      Complex, Private :: values
    Contains
+     ! Public Methods
+     Procedure, Public  :: print        => print_complex
+     ! Private implementations
      Procedure, Private :: multiply     => multiply_complex_complex
      Procedure, Private :: mult_real_dd => multiply_real_complex_dd
      Procedure, Private :: mult_comp_dd => multiply_complex_complex_dd
+     Procedure, Private :: put_real     => complex_put_real
+     Procedure, Private :: put_complex  => complex_put_complex
   End type complex_data
 
   Private
 
   Abstract Interface
+     Subroutine print_interface( a, title )
+       Import data
+       Implicit None
+       Class    ( data    ), Intent( In )           :: a
+       Character( Len = * ), Intent( In ), Optional :: title
+     End Subroutine print_interface
      Function multiply_interface( a, b ) Result( r )
        Import data
        Implicit None
@@ -57,6 +77,18 @@ Module data_module
        Class( data         ), Intent( In ) :: b
        Class( complex_data ), Intent( In ) :: a
      End Function mult_comp_dd_interface
+     Subroutine put_real_interface( a, v )
+       Import data
+       Implicit None
+       Class( data ), Intent( InOut ) :: a
+       Real         , Intent( In    ) :: v
+     End Subroutine put_real_interface
+     Subroutine put_complex_interface( a, v )
+       Import data
+       Implicit None
+       Class( data ), Intent( InOut ) :: a
+       Complex      , Intent( In    ) :: v
+     End Subroutine put_complex_interface
   End Interface
  
 Contains
@@ -161,5 +193,65 @@ Contains
     r%values = a%values * b%values
     
   End Function multiply_complex_complex_dd
+
+  Subroutine print_real( a, title )
+
+    Class( real_data )  , Intent( In )           :: a
+    Character( Len = * ), Intent( In ), Optional :: title
+
+    If( Present( title ) ) Then
+       Write( *, * ) title
+    End If
+    Write( *, * ) a%values
+
+  End Subroutine print_real
+  
+  Subroutine print_complex( a, title )
+
+    Class( complex_data ), Intent( In )           :: a
+    Character( Len = *  ), Intent( In ), Optional :: title
+
+    If( Present( title ) ) Then
+       Write( *, * ) title
+    End If
+    Write( *, * ) a%values
+
+  End Subroutine print_complex
+
+  Subroutine real_put_real( a, v )
+
+    Class( real_data ), Intent( InOut ) :: a
+    Real              , Intent( In    ) :: v
+
+    a%values = v
+    
+  End Subroutine real_put_real
+  
+  Subroutine real_put_complex( a, v )
+
+    Class( real_data ), Intent( InOut ) :: a
+    Complex           , Intent( In    ) :: v
+
+    Stop "Putting a complex into real"
+    
+  End Subroutine real_put_complex
+  
+  Subroutine complex_put_complex( a, v )
+
+    Class( complex_data ), Intent( InOut ) :: a
+    Complex              , Intent( In    ) :: v
+
+    a%values = v
+    
+  End Subroutine complex_put_complex
+  
+  Subroutine complex_put_real( a, v )
+
+    Class( complex_data ), Intent( InOut ) :: a
+    Real                 , Intent( In    ) :: v
+
+    Stop "Putting a real into complex"
+    
+  End Subroutine complex_put_real
   
 End Module data_module
