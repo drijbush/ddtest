@@ -6,10 +6,11 @@ Module data_module
      !! Base data type
    Contains
      ! Public Methods
-     Generic                                      , Public  :: Operator( * ) => multiply
+     Procedure( create_interface       ), Deferred, Public  :: create
      Procedure( print_interface        ), Deferred, Public  :: print
      Generic                                      , Public  :: put           => put_real, put_complex
      Generic                                      , Public  :: get           => get_real, get_complex
+     Generic                                      , Public  :: Operator( * ) => multiply
      ! Private implementations
      Procedure( multiply_interface     ), Deferred, Private :: multiply
      Procedure( mult_real_dd_interface ), Deferred, Private :: mult_real_dd
@@ -22,9 +23,10 @@ Module data_module
 
   Type, Public, Extends( data ) :: real_data
      !! Real data type
-     Real, Private :: values
+     Real, Allocatable, Private :: values
    Contains
      ! Public Methods
+     Procedure, Public  :: create       => create_real
      Procedure, Public  :: print        => print_real
      ! Private implementations
      Procedure, Private :: multiply     => multiply_real_real
@@ -38,9 +40,10 @@ Module data_module
 
   Type, Public, Extends( data ) :: complex_data
      !! Complex data type
-     Complex, Private :: values
+     Complex, Allocatable, Private :: values
    Contains
      ! Public Methods
+     Procedure, Public  :: create       => create_complex
      Procedure, Public  :: print        => print_complex
      ! Private implementations
      Procedure, Private :: multiply     => multiply_complex_complex
@@ -55,6 +58,11 @@ Module data_module
   Private
 
   Abstract Interface
+     Subroutine create_interface( a )
+       Import data
+       Implicit None
+       Class    ( data ), Intent( Out ) :: a
+     End Subroutine create_interface
      Subroutine print_interface( a, title )
        Import data
        Implicit None
@@ -111,6 +119,22 @@ Module data_module
   End Interface
  
 Contains
+
+  Subroutine create_real( a )
+
+    Class( real_data ), Intent( Out ) :: a
+
+    Allocate( a%values )
+
+  End Subroutine create_real
+
+  Subroutine create_complex( a )
+
+    Class( complex_data ), Intent( Out ) :: a
+
+    Allocate( a%values )
+
+  End Subroutine create_complex
 
   Function multiply_real_real( a, b ) Result( r )
 
