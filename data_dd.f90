@@ -9,12 +9,15 @@ Module data_module
      Generic                                      , Public  :: Operator( * ) => multiply
      Procedure( print_interface        ), Deferred, Public  :: print
      Generic                                      , Public  :: put           => put_real, put_complex
+     Generic                                      , Public  :: get           => get_real, get_complex
      ! Private implementations
      Procedure( multiply_interface     ), Deferred, Private :: multiply
      Procedure( mult_real_dd_interface ), Deferred, Private :: mult_real_dd
      Procedure( mult_comp_dd_interface ), Deferred, Private :: mult_comp_dd
      Procedure( put_real_interface     ), Deferred, Private :: put_real
      Procedure( put_complex_interface  ), Deferred, Private :: put_complex
+     Procedure( get_real_interface     ), Deferred, Private :: get_real
+     Procedure( get_complex_interface  ), Deferred, Private :: get_complex
   End type data
 
   Type, Public, Extends( data ) :: real_data
@@ -29,6 +32,8 @@ Module data_module
      Procedure, Private :: mult_comp_dd => multiply_complex_real_dd
      Procedure, Private :: put_real     => real_put_real
      Procedure, Private :: put_complex  => real_put_complex
+     Procedure, Private :: get_real     => real_get_real
+     Procedure, Private :: get_complex  => real_get_complex
   End type real_data
 
   Type, Public, Extends( data ) :: complex_data
@@ -43,6 +48,8 @@ Module data_module
      Procedure, Private :: mult_comp_dd => multiply_complex_complex_dd
      Procedure, Private :: put_real     => complex_put_real
      Procedure, Private :: put_complex  => complex_put_complex
+     Procedure, Private :: get_real     => complex_get_real
+     Procedure, Private :: get_complex  => complex_get_complex
   End type complex_data
 
   Private
@@ -89,6 +96,18 @@ Module data_module
        Class( data ), Intent( InOut ) :: a
        Complex      , Intent( In    ) :: v
      End Subroutine put_complex_interface
+     Subroutine get_real_interface( a, v )
+       Import data
+       Implicit None
+       Class( data ), Intent( In    ) :: a
+       Real         , Intent(   Out ) :: v
+     End Subroutine get_real_interface
+     Subroutine get_complex_interface( a, v )
+       Import data
+       Implicit None
+       Class( data ), Intent( In    ) :: a
+       Complex      , Intent(   Out ) :: v
+     End Subroutine get_complex_interface
   End Interface
  
 Contains
@@ -253,5 +272,41 @@ Contains
     Stop "Putting a real into complex"
     
   End Subroutine complex_put_real
+  
+  Subroutine real_get_real( a, v )
+
+    Class( real_data ), Intent( In    ) :: a
+    Real              , Intent(   Out ) :: v
+
+    v = a%values
+    
+  End Subroutine real_get_real
+  
+  Subroutine real_get_complex( a, v )
+
+    Class( real_data ), Intent( In    ) :: a
+    Complex           , Intent(   Out ) :: v
+
+    Stop "Getting a complex into real"
+    
+  End Subroutine real_get_complex
+  
+  Subroutine complex_get_complex( a, v )
+
+    Class( complex_data ), Intent( In    ) :: a
+    Complex              , Intent(   Out ) :: v
+
+    v = a%values
+    
+  End Subroutine complex_get_complex
+  
+  Subroutine complex_get_real( a, v )
+
+    Class( complex_data ), Intent( In    ) :: a
+    Real                 , Intent(   Out ) :: v
+
+    Stop "Getting a real into complex"
+    
+  End Subroutine complex_get_real
   
 End Module data_module
