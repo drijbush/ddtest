@@ -12,13 +12,13 @@ Module data_module
      Generic                                      , Public  :: get           => get_real, get_complex
      Generic                                      , Public  :: Operator( * ) => multiply
      ! Private implementations
-     Procedure( multiply_interface     ), Deferred, Private :: multiply
-     Procedure( mult_real_dd_interface ), Deferred, Private :: mult_real_dd
-     Procedure( mult_comp_dd_interface ), Deferred, Private :: mult_comp_dd
-     Procedure( put_real_interface     ), Deferred, Private :: put_real
-     Procedure( put_complex_interface  ), Deferred, Private :: put_complex
-     Procedure( get_real_interface     ), Deferred, Private :: get_real
-     Procedure( get_complex_interface  ), Deferred, Private :: get_complex
+     Procedure( multiply_interface     ), Deferred,            Private :: multiply
+     Procedure( mult_real_dd_interface ), Deferred, Pass( b ), Private :: mult_real_dd
+     Procedure( mult_comp_dd_interface ), Deferred, Pass( b ), Private :: mult_comp_dd
+     Procedure( put_real_interface     ), Deferred,            Private :: put_real
+     Procedure( put_complex_interface  ), Deferred,            Private :: put_complex
+     Procedure( get_real_interface     ), Deferred,            Private :: get_real
+     Procedure( get_complex_interface  ), Deferred,            Private :: get_complex
   End type data
 
   Type, Public, Extends( data ) :: real_data
@@ -30,8 +30,8 @@ Module data_module
      Procedure, Public  :: print        => print_real
      ! Private implementations
      Procedure, Private :: multiply     => multiply_real_real
-     Procedure, Private :: mult_real_dd => multiply_real_real_dd
-     Procedure, Private :: mult_comp_dd => multiply_complex_real_dd
+     Procedure, Pass( b ), Private :: mult_real_dd => multiply_real_real_dd
+     Procedure, Pass( b ), Private :: mult_comp_dd => multiply_complex_real_dd
      Procedure, Private :: put_real     => real_put_real
      Procedure, Private :: put_complex  => real_put_complex
      Procedure, Private :: get_real     => real_get_real
@@ -47,8 +47,8 @@ Module data_module
      Procedure, Public  :: print        => print_complex
      ! Private implementations
      Procedure, Private :: multiply     => multiply_complex_complex
-     Procedure, Private :: mult_real_dd => multiply_real_complex_dd
-     Procedure, Private :: mult_comp_dd => multiply_complex_complex_dd
+     Procedure, Pass( b ), Private :: mult_real_dd => multiply_real_complex_dd
+     Procedure, Pass( b ), Private :: mult_comp_dd => multiply_complex_complex_dd
      Procedure, Private :: put_real     => complex_put_real
      Procedure, Private :: put_complex  => complex_put_complex
      Procedure, Private :: get_real     => complex_get_real
@@ -76,21 +76,21 @@ Module data_module
        Class( data ), Intent( In ) :: a
        Class( data ), Intent( In ) :: b
      End Function multiply_interface
-     Function mult_real_dd_interface( b, a ) Result( r )
+     Function mult_real_dd_interface( a, b ) Result( r )
        Import data
        Import real_data
        Implicit None
        Class( real_data ), Allocatable  :: r
-       Class( data      ), Intent( In ) :: b
        Class( real_data ), Intent( In ) :: a
+       Class( data      ), Intent( In ) :: b
      End Function mult_real_dd_interface
-     Function mult_comp_dd_interface( b, a ) Result( r )
+     Function mult_comp_dd_interface( a, b ) Result( r )
        Import data
        Import complex_data
        Implicit None
        Class( complex_data ), Allocatable  :: r
-       Class( data         ), Intent( In ) :: b
        Class( complex_data ), Intent( In ) :: a
+       Class( data         ), Intent( In ) :: b
      End Function mult_comp_dd_interface
      Subroutine put_real_interface( a, v )
        Import data
@@ -154,7 +154,7 @@ Contains
 
   End Function multiply_real_real
   
-  Function multiply_real_real_dd( b, a ) Result( r )
+  Function multiply_real_real_dd( a, b ) Result( r )
 
     !! Multiply two real pieces of data together
 
@@ -162,8 +162,8 @@ Contains
 
     Class( real_data ), Allocatable :: r
 
-    Class( real_data ), Intent( In ) :: b
     Class( real_data ), Intent( In ) :: a
+    Class( real_data ), Intent( In ) :: b
 
     Allocate( real_data :: r )
     
@@ -171,21 +171,21 @@ Contains
 
   End Function multiply_real_real_dd
   
-  Function multiply_complex_real_dd( b, a ) Result( r )
+  Function multiply_complex_real_dd( a, b ) Result( r )
 
     Implicit None
 
     Class( complex_data ), Allocatable :: r
 
-    Class(    real_data ), Intent( In ) :: b
     Class( complex_data ), Intent( In ) :: a
+    Class(    real_data ), Intent( In ) :: b
 
     ! Could implement this but for what we want to do ....
     Stop "Error: multiplying a real by a complex"
     
   End Function multiply_complex_real_dd
   
-  Function multiply_real_complex_dd( b, a ) Result( r )
+  Function multiply_real_complex_dd( a, b ) Result( r )
 
     !! Multiply two real pieces of data together
 
@@ -220,7 +220,7 @@ Contains
 
   End Function multiply_complex_complex
   
-  Function multiply_complex_complex_dd( b, a ) Result( r )
+  Function multiply_complex_complex_dd( a, b ) Result( r )
 
     !! Multiply two complex pieces of data together
 
@@ -228,8 +228,8 @@ Contains
 
     Class( complex_data ), Allocatable :: r
 
-    Class( complex_data ), Intent( In ) :: b
     Class( complex_data ), Intent( In ) :: a
+    Class( complex_data ), Intent( In ) :: b
 
     Allocate( complex_data :: r )
     
