@@ -10,7 +10,7 @@ CC = cc
 CFLAGS = -O
 FC = f77
 FFLAGS = -O
-F90 = gfortran
+F90 = gfortran-8
 F90FLAGS = -O -g -std=f2008 -Wall -Wextra -fcheck=all -finit-real=snan
 LDFLAGS = 
 
@@ -26,6 +26,8 @@ clean:
 
 .f90.o:
 	$(F90) $(F90FLAGS) -c $<
+
+%.o : %.mod
 
 ks_array.o: ks_data_module.o
 ks_data_module.o: data_dd.o

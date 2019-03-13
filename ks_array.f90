@@ -14,11 +14,13 @@ Module ks_array_module
      ! Public Methods
      Procedure, Public  :: create
      Generic  , Public  :: Operator( * ) => mult_ks_by_ks
+     Generic  , Public  :: Operator( .Conjg. ) => conjugate
      Generic  , Public  :: put           => put_real, put_complex
      Generic  , Public  :: get           => get_real, get_complex
      Procedure, Public  :: print
      ! Private implementations
      Procedure, Private :: mult_ks_by_ks
+     Procedure, Private :: conjugate
      Procedure, Private :: put_real, put_complex
      Procedure, Private :: get_real, get_complex
   End type ks_array
@@ -69,6 +71,28 @@ Contains
     End Do
     
   End Function mult_ks_by_ks
+
+  Function conjugate( a ) Result( r )
+
+    !! Multiply in turn each of the elements of A by B returning the result in R
+
+    Implicit None
+    Type ( ks_array ), Allocatable :: r
+    Class( ks_array ), Intent( In ) :: a
+
+    Integer :: n_ks
+    Integer :: ks
+
+    Allocate( r )
+    Allocate( r%ks, source = a%ks )
+
+    n_ks = Size( r%ks )
+
+    Do ks = 1, n_ks
+       r%ks( ks ) = .Conjg. a%ks( ks )
+    End Do
+    
+  End Function conjugate
 
   Subroutine put_real( a, ks, v )
 

@@ -13,12 +13,14 @@ Module ks_data_module
    Contains
      ! Public Methods
      Generic  , Public  :: Operator( * ) => mult_ks_by_ks
+     Generic  , Public  :: Operator( .conjg. ) => conjugate
      Procedure, Public  :: create
      Generic  , Public  :: put => put_real, put_complex
      Generic  , Public  :: get => get_real, get_complex
      Procedure, Public  :: print
      ! Private implementations
      Procedure, Private :: mult_ks_by_ks
+     Procedure, Private :: conjugate
      Procedure, Private :: put_real
      Procedure, Private :: put_complex
      Procedure, Private :: get_real
@@ -66,6 +68,18 @@ Contains
     r%ks = a%ks * b%ks
     
   End Function mult_ks_by_ks
+
+  Function conjugate( a ) result( r )
+
+    Implicit None
+    Type ( ks_data ), Allocatable :: r
+    Class( ks_data ), Intent( In ) :: a
+
+    Allocate( r )
+    Allocate( r%ks, source = a%ks )
+    r%ks = .Conjg. a%ks
+
+  End Function conjugate
 
   Subroutine put_real( a, v )
 

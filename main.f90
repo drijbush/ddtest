@@ -38,7 +38,7 @@ Program test
         Call Random_number( r2 )
         cb = Cmplx( r1, r2 )
         Call B%put( ks, cb )
-        Write( *, * ) 'Correct result #', ks,' = ', ca * cb
+        Write( *, * ) 'Correct result #', ks,' = ', ca * Conjg( cb )
      Else
         Call Random_number( ra )
         Call A%put( ks, ra )
@@ -52,9 +52,9 @@ Program test
   Call A%print( 'A' )
   Call B%print( 'B' )
 
-  A = A * B
+  A = A * .Conjg. B
 
   Write( *, * )
-  Call A%print( 'A * B' )
+  Call A%print( 'A * ( Conjg( B ) )' )
 
 End Program test
