@@ -26,16 +26,16 @@ Module data_module
      Real, Allocatable, Private :: values
    Contains
      ! Public Methods
-     Procedure, Public  :: create       => create_real
-     Procedure, Public  :: print        => print_real
+     Procedure,            Public  :: create       => create_real
+     Procedure,            Public  :: print        => print_real
      ! Private implementations
-     Procedure, Private :: multiply     => multiply_real_real
+     Procedure,            Private :: multiply     => multiply_real_real
      Procedure, Pass( b ), Private :: mult_real_dd => multiply_real_real_dd
      Procedure, Pass( b ), Private :: mult_comp_dd => multiply_complex_real_dd
-     Procedure, Private :: put_real     => real_put_real
-     Procedure, Private :: put_complex  => real_put_complex
-     Procedure, Private :: get_real     => real_get_real
-     Procedure, Private :: get_complex  => real_get_complex
+     Procedure,            Private :: put_real     => real_put_real
+     Procedure,            Private :: put_complex  => real_put_complex
+     Procedure,            Private :: get_real     => real_get_real
+     Procedure,            Private :: get_complex  => real_get_complex
   End type real_data
 
   Type, Public, Extends( data ) :: complex_data
@@ -43,16 +43,16 @@ Module data_module
      Complex, Allocatable, Private :: values
    Contains
      ! Public Methods
-     Procedure, Public  :: create       => create_complex
-     Procedure, Public  :: print        => print_complex
+     Procedure, Public             :: create       => create_complex
+     Procedure, Public             :: print        => print_complex
      ! Private implementations
-     Procedure, Private :: multiply     => multiply_complex_complex
+     Procedure, Private            :: multiply     => multiply_complex_complex
      Procedure, Pass( b ), Private :: mult_real_dd => multiply_real_complex_dd
      Procedure, Pass( b ), Private :: mult_comp_dd => multiply_complex_complex_dd
-     Procedure, Private :: put_real     => complex_put_real
-     Procedure, Private :: put_complex  => complex_put_complex
-     Procedure, Private :: get_real     => complex_get_real
-     Procedure, Private :: get_complex  => complex_get_complex
+     Procedure, Private            :: put_real     => complex_put_real
+     Procedure, Private            :: put_complex  => complex_put_complex
+     Procedure, Private            :: get_real     => complex_get_real
+     Procedure, Private            :: get_complex  => complex_get_complex
   End type complex_data
 
   Private
