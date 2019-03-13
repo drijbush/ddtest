@@ -8,13 +8,15 @@ Module data_module
      ! Public Methods
      Procedure( create_interface       ), Deferred, Public  :: create
      Procedure( print_interface        ), Deferred, Public  :: print
-     Generic                                      , Public  :: put           => put_real, put_complex
-     Generic                                      , Public  :: get           => get_real, get_complex
-     Generic                                      , Public  :: Operator( * ) => multiply
+     Generic                                      , Public  :: put                 => put_real, put_complex
+     Generic                                      , Public  :: get                 => get_real, get_complex
+     Generic                                      , Public  :: Operator( *       ) => multiply
+     Generic                                      , Public  :: Operator( .conjg. ) => conjugate
      ! Private implementations
      Procedure( multiply_interface     ), Deferred,            Private :: multiply
      Procedure( mult_real_dd_interface ), Deferred, Pass( b ), Private :: mult_real_dd
      Procedure( mult_comp_dd_interface ), Deferred, Pass( b ), Private :: mult_comp_dd
+     Procedure( conjugate_interface    ), Deferred,            Private :: conjugate
      Procedure( put_real_interface     ), Deferred,            Private :: put_real
      Procedure( put_complex_interface  ), Deferred,            Private :: put_complex
      Procedure( get_real_interface     ), Deferred,            Private :: get_real
@@ -32,6 +34,7 @@ Module data_module
      Procedure,            Private :: multiply     => multiply_real_real
      Procedure, Pass( b ), Private :: mult_real_dd => multiply_real_real_dd
      Procedure, Pass( b ), Private :: mult_comp_dd => multiply_complex_real_dd
+     Procedure,            Private :: conjugate    => conjg_real
      Procedure,            Private :: put_real     => real_put_real
      Procedure,            Private :: put_complex  => real_put_complex
      Procedure,            Private :: get_real     => real_get_real
@@ -49,6 +52,7 @@ Module data_module
      Procedure, Private            :: multiply     => multiply_complex_complex
      Procedure, Pass( b ), Private :: mult_real_dd => multiply_real_complex_dd
      Procedure, Pass( b ), Private :: mult_comp_dd => multiply_complex_complex_dd
+     Procedure,            Private :: conjugate    => conjg_complex
      Procedure, Private            :: put_real     => complex_put_real
      Procedure, Private            :: put_complex  => complex_put_complex
      Procedure, Private            :: get_real     => complex_get_real
@@ -92,6 +96,11 @@ Module data_module
        Class( complex_data ), Intent( In ) :: a
        Class( data         ), Intent( In ) :: b
      End Function mult_comp_dd_interface
+     Function conjugate_interface( a ) result( r )
+       Import data
+       Class( data ), Allocatable  :: r
+       Class( data ), Intent( In ) :: a
+     End Function conjugate_interface
      Subroutine put_real_interface( a, v )
        Import data
        Implicit None
@@ -237,6 +246,30 @@ Contains
     
   End Function multiply_complex_complex_dd
 
+  Function conjg_real( a ) Result( r )
+
+    Class( data ), Allocatable :: r
+
+    Class( real_data ), Intent( In ) :: a
+
+    Allocate( r, source = a )
+    
+!!$    r%values = a%values
+
+  End Function conjg_real
+  
+  Function conjg_complex( a ) Result( r )
+
+    Class( data ), Allocatable :: r
+
+    Class( complex_data ), Intent( In ) :: a
+
+    Allocate( r, source = a )
+
+!!$    r%values = a%values
+    
+  End Function conjg_complex
+  
   Subroutine print_real( a, title )
 
     Class( real_data )  , Intent( In )           :: a
